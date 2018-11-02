@@ -5,19 +5,19 @@ import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Handler;
+import android.os.Message;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-import io.realm.Realm;
-
 public class SnakeLogic extends SurfaceView implements Runnable {
-    Realm realm;
     User user;
-
+    private Handler handler;
     private Thread gameThread;
     private Context appContext;
     private enum Direction {UP, DOWN, LEFT, RIGHT};
@@ -39,7 +39,7 @@ public class SnakeLogic extends SurfaceView implements Runnable {
     private ArrayList<Integer> yPositions;
     private long MILLIS_PER_SECOND = 1000;
     private long nextFrameTime;
-    private volatile boolean isPlaying;
+    public volatile boolean isPlaying;
 
     private Random randomY;
     private Random randomX;
@@ -54,10 +54,11 @@ public class SnakeLogic extends SurfaceView implements Runnable {
         }
     }
 
-    public SnakeLogic(Context context, int sizeX, int sizeY, User user){
+    public SnakeLogic(Context context, int sizeX, int sizeY, User user, Handler handler){
         super(context);
-        this.realm = Realm.getDefaultInstance();
+        this.handler = handler;
         this.user = user;
+
         appContext = context;
         screenX = sizeX;
         screenY = sizeY;
@@ -75,7 +76,7 @@ public class SnakeLogic extends SurfaceView implements Runnable {
         startGame();
     }
 
-    public void startGame()
+    public Thread startGame()
     {
         xPositions.clear();
         yPositions.clear();
@@ -90,6 +91,7 @@ public class SnakeLogic extends SurfaceView implements Runnable {
             gameThread = new Thread(this);
             gameThread.start();
         }
+        return gameThread;
     }
 
     private void makeTarget(){
@@ -153,25 +155,15 @@ public class SnakeLogic extends SurfaceView implements Runnable {
 
         if(checkDeath()){
             isPlaying = false;
-            //gameThread.join();
-            //updateUserScore();
-
-            startGame();
-        }
-    }
-
-    private void updateUserScore(){
-        if(user.getHighScore() < score){
-            realm.executeTransactionAsync(realm -> {
-                realm.where(User.class).equalTo("id", user.getId()).findFirst().setHighScore(score);
-            });
+            Message msg = new Message();
+            msg.arg1 = score;
+            handler.sendMessage(msg);
         }
     }
 
     private void draw(){
         if(surfaceHolder.getSurface().isValid()){
             canvas = surfaceHolder.lockCanvas();
-
             canvas.drawColor(Color.BLACK);
             paint.setColor(Color.WHITE);
 

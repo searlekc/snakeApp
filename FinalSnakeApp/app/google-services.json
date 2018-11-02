@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "51915275975",
+    "firebase_url": "https://final-snake-app.firebaseio.com",
+    "project_id": "final-snake-app",
+    "storage_bucket": "final-snake-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:51915275975:android:59c544070f02e1ee",
+        "android_client_info": {
+          "package_name": "searlekc.com.finalsnakeapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "51915275975-epkbls767dd3aq90ufuahts36rc9nn7p.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "searlekc.com.finalsnakeapp",
+            "certificate_hash": "140a83642e08f22ce906c709635bdb144aa13e6f"
+          }
+        },
+        {
+          "client_id": "51915275975-hp5eqg1l82qqe9k4mrq4hhljia8n77rv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDN4MhLP08x_OnixbgyulO-S32p8aDFM68"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "51915275975-hp5eqg1l82qqe9k4mrq4hhljia8n77rv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

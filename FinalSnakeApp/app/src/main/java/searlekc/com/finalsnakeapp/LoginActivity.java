@@ -1,37 +1,32 @@
 package searlekc.com.finalsnakeapp;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import io.realm.ObjectServerError;
-import io.realm.Realm;
-import io.realm.RealmResults;
-import io.realm.SyncConfiguration;
-import io.realm.SyncCredentials;
-import io.realm.SyncUser;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import static java.lang.Math.toIntExact;
 
 public class LoginActivity extends AppCompatActivity {
-
-    private Realm realm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Realm.init(this);
         setContentView(R.layout.activity_login);
-
-        if(SyncUser.current() != null){
-            realm = Realm.getDefaultInstance();
-            User foundUser = realm.where(User.class).equalTo("id", SyncUser.current().getIdentity()).findFirst();
-            //Object comes back in a proxy format that is not serializable
-            User temp = new User(foundUser.getId(), foundUser.getUsername());
-            temp.setHighScore(foundUser.getHighScore());
-            goToSelectionScreen(temp);
-        }
 
         Button login = findViewById(R.id.loginButton);
         login.setOnClickListener(new View.OnClickListener() {
@@ -42,38 +37,34 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void attemptLogin(){
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
         EditText userInput = findViewById(R.id.username);
         final String userName = userInput.getText().toString();
-        SyncCredentials login = SyncCredentials.nickname(userName, false);
-        SyncUser.logInAsync(login, Constants.AUTH_URL, new SyncUser.Callback<SyncUser>(){
-            @Override
-            public void onSuccess(SyncUser user){
-                realm = Realm.getDefaultInstance();
-                RealmResults<User> realms = realm.where(User.class).findAllAsync();
-                User foundUser = realm.where(User.class).equalTo("username", userName).findFirst();
-                User newUser;
-                if(foundUser == null){
-                    newUser = new User(user.getIdentity(), userName);
-                    realm.executeTransactionAsync(realm -> {
-                        realm.insert(newUser);
-                    });
-                    goToSelectionScreen(newUser);
-                }else{
-                    User temp = new User();
-                    temp.setHighScore(foundUser.getHighScore());
-                    temp.setId(foundUser.getId());
-                    temp.setUsername(foundUser.getUsername());
-                    goToSelectionScreen(temp);
-                }
 
-
-            }
-
-            @Override
-            public void onError(ObjectServerError error) {
-
-            }
-        });
+        db.collection("users")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        boolean userFound = false;
+                        User user = null;
+                        for (DocumentSnapshot document : task.getResult()) {
+                            Map<String, Object> userMap = document.getData();
+                            if(userMap.get("username").equals(userName)){
+                                user = new User((String)userMap.get("username"), toIntExact((long)userMap.get("highscore")));
+                                userFound = true;
+                            }
+                        }
+                        if(!userFound) {
+                            Map<String, Object> userMap = new HashMap<>();
+                            userMap.put("username", userName);
+                            userMap.put("highscore", 0);
+                            user = new User(userName);
+                            db.collection("users").document(userName).set(userMap);
+                        }
+                        goToSelectionScreen(user);
+                    }
+                });
     }
 
     private void goToSelectionScreen(User user){
@@ -85,7 +76,5 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onDestroy(){
         super.onDestroy();
-        SyncUser.current().logOut();
-        realm.close();
     }
 }

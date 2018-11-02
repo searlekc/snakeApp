@@ -2,35 +2,28 @@ package searlekc.com.finalsnakeapp;
 
 import java.io.Serializable;
 
+import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
+import io.realm.permissions.Permission;
 
-public class User extends RealmObject implements Serializable{
-    @Required
+public class User implements Serializable{
     private String username;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    @PrimaryKey
-    @Required
-    private String id;
     private int highScore;
 
     public User(){
         highScore = 0;
     }
 
-    public User(String id, String username){
+    public User(String username){
         this.username = username;
-        this.id = id;
         highScore = 0;
+    }
+
+    public User(String username, int highScore){
+        this.highScore = highScore;
+        this.username = username;
     }
 
     public int getHighScore() {
