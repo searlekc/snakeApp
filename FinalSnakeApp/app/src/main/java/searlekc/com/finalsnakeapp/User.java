@@ -1,13 +1,13 @@
+/**
+ * @author: searlekc
+ */
 package searlekc.com.finalsnakeapp;
 
 import java.io.Serializable;
 
-import io.realm.RealmList;
-import io.realm.RealmObject;
-import io.realm.annotations.PrimaryKey;
-import io.realm.annotations.Required;
-import io.realm.permissions.Permission;
-
+/**
+ * User object to display and track username and score
+ */
 public class User implements Serializable{
     private String username;
     private int highScore;

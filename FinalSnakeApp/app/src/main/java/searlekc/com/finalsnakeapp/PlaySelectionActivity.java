@@ -1,6 +1,8 @@
+/**
+ * @author: searlekc
+ */
 package searlekc.com.finalsnakeapp;
 
-import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -9,7 +11,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
@@ -24,6 +25,9 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.Map;
 
+/**
+ * Governs selection screen
+ */
 public class PlaySelectionActivity extends AppCompatActivity {
 
     private User user;
@@ -57,32 +61,40 @@ public class PlaySelectionActivity extends AppCompatActivity {
                 makePopUp();
             }
         });
+
+        Button playWithFriend = findViewById(R.id.network_button);
+        playWithFriend.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getApplicationContext(), ChallengeActivity.class);
+                i.putExtra("user", user);
+                startActivity(i);
+            }
+        });
+
+        Button watchButton = findViewById(R.id.watch_button);
+        watchButton.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getApplicationContext(), GameActivity.class);
+                i.putExtra("user", user);
+                i.putExtra("type", true);
+                startActivity(i);
+            }
+        });
     }
 
-    @Override
-    protected void onDestroy(){
-        super.onDestroy();
-    }
-
+    /**
+     * Generates popup with table view for leaderboard
+     */
     private void makePopUp(){
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        TableLayout layout = new TableLayout(this);
+        final Context context = this;
+        View fragment = getLayoutInflater().inflate(R.layout.leaderboard, null);
         RelativeLayout parent = findViewById(R.id.selection_layout);
         final float density = this.getResources().getDisplayMetrics().density;
-        TableRow titles = new TableRow(this);
-        TextView nameTitle = new TextView(this);
-        nameTitle.setText("Username");
-        nameTitle.setTextColor(Color.WHITE);
-        nameTitle.setTextSize(35);
-        nameTitle.setPadding(0, 0, (int)(50*density), 0);
-        TextView scoresTitle = new TextView(this);
-        scoresTitle.setTextColor(Color.WHITE);
-        scoresTitle.setTextSize(35);
-        scoresTitle.setText("Score");
-        titles.addView(nameTitle);
-        titles.addView(scoresTitle);
-        layout.addView(titles);
-        final Context context = this;
+        TableLayout layout = fragment.findViewById(R.id.tableLayout);
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("users").orderBy("highscore", Query.Direction.DESCENDING).limit(5).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot documentSnapshots) {
@@ -105,22 +117,14 @@ public class PlaySelectionActivity extends AppCompatActivity {
                 PopupWindow leaderboard = new PopupWindow(context);
                 leaderboard.setHeight(parent.getHeight());
                 leaderboard.setWidth(parent.getWidth());
-                Button exitButton = new Button(context);
-                exitButton.setGravity(Gravity.BOTTOM);
+                Button exitButton = fragment.findViewById(R.id.exitButton);
                 exitButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         leaderboard.dismiss();
                     }
                 });
-                TableRow buttonRow = new TableRow(context);
-                exitButton.setText("Dismiss");
-                exitButton.setGravity(Gravity.CENTER_HORIZONTAL);
-                buttonRow.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
-                buttonRow.addView(exitButton);
-                buttonRow.setGravity(Gravity.CENTER);
-                layout.addView(buttonRow);
-                leaderboard.setContentView(layout);
+                leaderboard.setContentView(fragment);
                 leaderboard.showAtLocation(getWindow().getDecorView().findViewById(android.R.id.content), Gravity.BOTTOM, 10, 10);
             }
         });
