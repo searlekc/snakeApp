@@ -32,6 +32,10 @@ public class PlaySelectionActivity extends AppCompatActivity {
 
     private User user;
 
+    private final int POPUP_POSITION = 10;
+    private final int TEXTSIZE = 20;
+    private final int POPUP_PADDING = 50;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,12 +107,12 @@ public class PlaySelectionActivity extends AppCompatActivity {
                     TableRow row = new TableRow(context);
                     TextView name = new TextView(context);
                     name.setTextColor(Color.WHITE);
-                    name.setTextSize(30);
+                    name.setTextSize(TEXTSIZE);
                     name.setText(userMap.get("username").toString());
-                    name.setPadding(0, 0, (int)(50*density), 0);
+                    name.setPadding(0, 0, (int)(POPUP_PADDING*density), 0);
                     TextView score = new TextView(context);
                     score.setTextColor(Color.WHITE);
-                    score.setTextSize(30);
+                    score.setTextSize(TEXTSIZE);
                     score.setText(userMap.get("highscore").toString());
                     row.addView(name);
                     row.addView(score);
@@ -125,7 +129,7 @@ public class PlaySelectionActivity extends AppCompatActivity {
                     }
                 });
                 leaderboard.setContentView(fragment);
-                leaderboard.showAtLocation(getWindow().getDecorView().findViewById(android.R.id.content), Gravity.BOTTOM, 10, 10);
+                leaderboard.showAtLocation(getWindow().getDecorView().findViewById(android.R.id.content), Gravity.BOTTOM, POPUP_POSITION, POPUP_POSITION);
             }
         });
     }

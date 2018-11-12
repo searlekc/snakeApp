@@ -1,17 +1,13 @@
 package searlekc.com.finalsnakeapp;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Gallery;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -23,9 +19,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
-/**
- * @author: searlekc
- */
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -33,8 +27,15 @@ import java.util.UUID;
 
 import static java.lang.Math.toIntExact;
 
+/**
+ * @author: searlekc
+ */
 public class ChallengeActivity extends Activity {
-    User user;
+    private User user;
+    private final int TEXTSIZE = 20;
+    private final int LEFT_MARGIN = 20;
+    private final int RIGHT_MARGIN = 10;
+    private final int TABLEHEIGHT = 40;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,19 +109,19 @@ public class ChallengeActivity extends Activity {
                     if(doc.get("playerTwo").equals(user.getUsername()) && doc.get("result").equals("")){
                         TableRow row = new TableRow(getApplicationContext());
                         TextView username = new TextView(getApplicationContext());
-                        username.setTextSize(20);
+                        username.setTextSize(TEXTSIZE);
                         username.setText(doc.get("playerOne").toString());
                         username.setTextColor(Color.WHITE);
                         row.addView(username);
                         TextView score = new TextView(getApplicationContext());
-                        score.setTextSize(20);
+                        score.setTextSize(TEXTSIZE);
                         score.setText(doc.get("playerOneScore").toString());
                         score.setTextColor(Color.WHITE);
                         row.addView(score);
                         Button accept = new Button(getApplicationContext());
                         accept.setBackground(getDrawable(R.drawable.green_check));
-                        TableRow.LayoutParams responseButtons = new TableRow.LayoutParams(dpToPx(40), TableRow.LayoutParams.WRAP_CONTENT);
-                        responseButtons.setMargins(dpToPx(20), 0, dpToPx(10), 0);
+                        TableRow.LayoutParams responseButtons = new TableRow.LayoutParams(dpToPx(TABLEHEIGHT), TableRow.LayoutParams.WRAP_CONTENT);
+                        responseButtons.setMargins(dpToPx(LEFT_MARGIN), 0, dpToPx(RIGHT_MARGIN), 0);
                         accept.setLayoutParams(responseButtons);
                         accept.setOnClickListener(new View.OnClickListener(){
                             @Override

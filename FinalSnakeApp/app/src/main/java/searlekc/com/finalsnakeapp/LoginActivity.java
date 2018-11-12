@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -60,6 +61,7 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         boolean userFound = false;
+                        boolean userCreated = false;
                         User user = null;
                         for (DocumentSnapshot document : task.getResult()) {
                             Map<String, Object> userMap = document.getData();
@@ -70,13 +72,20 @@ public class LoginActivity extends AppCompatActivity {
                             }
                         }
                         if(!userFound) {
-                            Map<String, Object> userMap = new HashMap<>();
-                            userMap.put("username", userName);
-                            userMap.put("highscore", 0);
-                            user = new User(userName);
-                            db.collection("users").document(userName).set(userMap);
+                            if(userName.length() < 15) {
+                                Map<String, Object> userMap = new HashMap<>();
+                                userMap.put("username", userName);
+                                userMap.put("highscore", 0);
+                                user = new User(userName);
+                                db.collection("users").document(userName).set(userMap);
+                                userCreated = false;
+                            }else{
+                                Toast.makeText(getApplicationContext(), "Please enter a name of 15 characters or less", Toast.LENGTH_LONG).show();
+                            }
                         }
-                        goToSelectionScreen(user);
+                        if(userFound || userCreated) {
+                            goToSelectionScreen(user);
+                        }
                     }
                 });
     }
